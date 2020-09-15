@@ -1,0 +1,1 @@
+1a. questão 2 pede apenas 5 pesos finais, perceptron repete recálculo até encontrar saída ideal.
