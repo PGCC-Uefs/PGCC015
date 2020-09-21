@@ -46,8 +46,6 @@
             var neuronio = new perceptron();
             neuronio.iniciar(0.01, 1000);
             neuronio.treinamento(dados);
-            console.log("Resultado: " + neuronio.run([-1, 1.1155, 0.6043, 7.4446]));
-            console.log("Epocas: " + neuronio.showEpocas);
             var teste = [
                 {inputs: [-1, -0.3565,  0.0620, 5.9891]},
                 {inputs: [-1, -0.7842,  1.1267, 5.5912]},
@@ -60,8 +58,15 @@
                 {inputs: [-1, -1.3970,  0.7141, 4.9263]},
                 {inputs: [-1, -1.8842, -0.2805, 1.2548]}
                 ];
+            var i = 0;
+            while(i < teste.length){
+                console.log("Amostra "+(i+1)+" Y: " + neuronio.u + " Saída: " + neuronio.executar(teste[i].inputs));
+                i++;
+            }
+            console.log("Epocas: " + neuronio.showEpocas);
         </script>
-   </head>
-   <body>
-   </body>
+    </head>
+    <body>
+        Dados no console -> Ctrl + Shift + i
+    </body>
 </html>

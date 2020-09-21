@@ -8,11 +8,14 @@ this.perceptron = function(){
      var redeNeural = this;
      this.pesos = [];
      this.bias = -1;
+     this.u =0;
      this.numEpoca = 1000;
      this.showEpocas = 0;
      this.txAprendizagem = 0.01;
-     this.funcaoAtivacao = function(soma){
-          return (soma >= 0? 1: -1);
+     this.funcaoAtivacao = function(u){
+          //console.log(1 / (1 + Math.exp(-1 * u))); // sigmoid
+          redeNeural.u = u;
+          return (u >= 0? 1: -1);
      }
      this.iniciar = function(txAprendizagem,numEpoca){
           redeNeural.txAprendizagem=txAprendizagem;
@@ -22,7 +25,7 @@ this.perceptron = function(){
           console.log("Pesos iniciais:");
           for(i=0;i<entradas;i++){
                 redeNeural.pesos[i] = Math.random();
-                console.log("wi"+i+": "+redeNeural.pesos[i]); // apresenta na tela
+                console.log("wi"+i+": "+redeNeural.pesos[i]); // apresenta na tela 
           }
      }
      this.recalcularPesos = function(diferenca, inputs){
@@ -37,7 +40,7 @@ this.perceptron = function(){
           }
           return soma += redeNeural.bias;
      }
-     this.run = inputs => {
+     this.executar = inputs => {
           var u = redeNeural.calcularU(inputs);
           return redeNeural.funcaoAtivacao(u);
      }
@@ -51,7 +54,7 @@ this.perceptron = function(){
                var diferenca = 0;
                for(i=0;i<dados.length;i++){
                     redeNeural.bias = dados[i].inputs[0];
-                    var resultado = redeNeural.run(dados[i].inputs); // roda o teste
+                    var resultado = redeNeural.executar(dados[i].inputs); // roda o teste
                     if(resultado != dados[i].output){
                          erro = true;
                          diferenca = dados[i].output - resultado;
