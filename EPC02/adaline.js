@@ -2,20 +2,22 @@
 // rede neural Adaline EPC02
 // Noberto Pires Maciel
 
-console.log("adaline:");
+console.log("ADALINE:");
 
 this.adaline = function(){
      var redeNeural = this;
      this.pesos = [];
      this.bias = -1;
-     this.numEpoca = 1000; //valor default
+     this.u =0;
+     this.numEpoca = 1000;
      this.showEpocas = 0;
-     this.txAprendizagem = 0.0025; //valor default
+     this.txAprendizagem = 0.0025;
      this.precisao = 10**-6;
      this.eqm = 0; //eqm anterior
      this.funcaoAtivacao = function(u){
-          //return 1 / (1 + Math.exp(-1 * u)); // sigmoid
-          return (u >= 0? 1: -1); // sinal
+          return 1 / (1 + Math.exp(-1 * u)); // sigmoid
+          //redeNeural.u = u;
+         // return (u >= 0? 1: -1); // sinal
      }
      this.iniciar = function(txAprendizagem,numEpoca){
           redeNeural.txAprendizagem=txAprendizagem;
@@ -25,7 +27,7 @@ this.adaline = function(){
           console.log("Pesos iniciais:");
           for(i=0;i<entradas;i++){
                 redeNeural.pesos[i] = Math.random();
-                console.log("wi"+i+": "+redeNeural.pesos[i]); // apresenta na tela
+                console.log("wi"+i+": "+redeNeural.pesos[i]);
           }
      }
      this.recalcularPesos = function(diferenca, inputs){
@@ -51,16 +53,6 @@ this.adaline = function(){
           //console.log("Eqm(fi): "+eqm);
           return eqm;
      }
-/*      this.calcularEqm = function(dados){
-          redeNeural.eqm = 0;
-          var amostras = dados.length;
-          for(i=0;i<amostras;i++){
-               var u = redeNeural.calcularU(dados[i].inputs);
-               eqmAtual += (dados[i].output-u);
-          }
-          redeNeural.eqm = ((eqmAtual**2)/amostras) - redeNeural.eqm; // eqm anterior EQM(t), t=epoca
-          console.log("Eqm(fi): "+redeNeural.eqm+" Eqm(at): "+eqmAtual);
-     } */
      this.executar = function(inputs){
           var u = redeNeural.calcularU(inputs);
           return redeNeural.funcaoAtivacao(u);
@@ -88,6 +80,5 @@ this.adaline = function(){
           for(z=0;z<tamPesos;z++){
                console.log("wf"+z+": "+redeNeural.pesos[z]);
           }
-          console.log("u: "+u);
      }
 }

@@ -48,13 +48,6 @@
             {inputs: [-1,  0.8298, -1.4089, 0.3119, 1.3235], output:  -1.0000}
             ];
             console.log("Registros: " + dados.length);
-/*             for(z=0;z<dados.length;z++){
-                console.log(z+" - "+typeof dados[z].inputs[0]);
-                console.log(z+" - "+typeof dados[z].inputs[1]);
-                console.log(z+" - "+typeof dados[z].inputs[2]);
-                console.log(z+" - "+typeof dados[z].inputs[3]);
-                console.log(z+" - "+typeof dados[z].inputs[4]);
-            } */
             var neuronio = new adaline();
             neuronio.iniciar(0.0025, 100000);
             neuronio.treinamento(dados);
@@ -77,8 +70,15 @@
                 {inputs: [-1, 0.5060, 1.3317, 0.9222, 3.7174]},
                 {inputs: [-1, 1.6375, -0.7911, 0.7537, 0.5515]}
                 ];
+                var i = 0;
+            while(i < teste.length){
+                console.log("Amostra "+(i+1)+" Y: " + neuronio.u + " Saída: " + neuronio.executar(teste[i].inputs));
+                i++;
+            }
+            console.log("Epocas: " + neuronio.showEpocas);
         </script>
-   </head>
-   <body>
-   </body>
+    </head>
+    <body>
+        Dados no console -> Ctrl + Shift + i
+    </body>
 </html>
