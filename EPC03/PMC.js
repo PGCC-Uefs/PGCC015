@@ -1,5 +1,5 @@
 // Mestrado PGCC Uefs 2020.1
-// Perceptron Multi Camadas EPC03
+// Perceptron Multicamadas EPC03
 // Noberto Pires Maciel
 
 console.log("PMC:");
@@ -11,7 +11,7 @@ this.adaline = function(){
      this.u =0;
      this.numEpoca = 1000;
      this.showEpocas = 0;
-     this.txAprendizagem = 0.0025;
+     this.txAprendizagem = 0.1;
      this.precisao = 10**-6;
      this.eqm = 0; //eqm anterior
      this.funcaoAtivacao = function(u){
