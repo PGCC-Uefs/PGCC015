@@ -4,7 +4,7 @@
 
 console.log("PMC:");
 
-this.adaline = function(){
+this.pmc = function(){
      var redeNeural = this;
      this.pesos = [];
      this.bias = -1;

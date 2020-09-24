@@ -9,14 +9,17 @@
         <meta http-equiv="pragma" content="no-cache" />
         <title>Perceptron Multicamadas - EPC03 - PGCC 2020.1</title>
         <script src="PMC.js"></script>
-        <script>
-            var dados = [
-            {inputs: [-1,  0.4329, -1.3719, 0.7022, -0.8535], output:  1.0000} // ler o arquivo .dat
-            ];
-            console.log("Registros: " + dados.length);
-            var neuronio = new adaline();
+        <script src="reader.js"></script>
+        <script>        
+        function rodar(){
+            var neuronio = new pmc();
+            var lerDados = new ler();
             neuronio.iniciar(0.1, 100000);
-            neuronio.treinamento(dados);
+            console.log(JSON.stringify(lerDados));
+
+            console.log(lerDados);
+    
+            neuronio.treinamento(lerDados.dados);
             console.log("Resultado: " + neuronio.executar([-1, 0.9694, 0.6909, 0.4334, 3.4965]));
             console.log("Epocas: " + neuronio.showEpocas);
             var teste = [
@@ -28,9 +31,15 @@
                 i++;
             }
             console.log("Epocas: " + neuronio.showEpocas);
+        }
         </script>
     </head>
     <body>
-        Dados no console -> Ctrl + Shift + i - criar tabela aqui
+        Selecione o arquivo .dat:
+        <input type="file" id="txtfiletoread" /><br />
+        <button onclick="rodar();">Executar</button><br>
+        <div>Conteúdo do arquivo:</div>
+        <div id="filecontents">
+        </div>
     </body>
 </html>
