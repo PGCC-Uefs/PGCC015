@@ -15,7 +15,7 @@ this.pmc = function(){
      this.precisao = 10**-6;
      this.eqm = 0; //eqm anterior
      this.funcaoAtivacao = function(u){
-          return 1 / (1 + Math.exp(-1 * u)); // sigmoid logística, AJUSTAR
+          return 1 / (1 + Math.exp(-1 * u)); // sigmoid
           //redeNeural.u = u;
          // return (u >= 0? 1: -1); // sinal
      }
@@ -50,7 +50,7 @@ this.pmc = function(){
                eqm += eqm  + (dados[i].output-u)**2;
           }
           eqm = (eqm/amostras);
-          console.log("Eqm(fi): "+eqm);
+          //console.log("Eqm(fi): "+eqm);
           return eqm;
      }
      this.executar = function(inputs){

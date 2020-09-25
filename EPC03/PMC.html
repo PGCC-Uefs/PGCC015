@@ -9,17 +9,64 @@
         <meta http-equiv="pragma" content="no-cache" />
         <title>Perceptron Multicamadas - EPC03 - PGCC 2020.1</title>
         <script src="PMC.js"></script>
-        <script src="reader.js"></script>
-        <script>        
+        <script>
         function rodar(){
+            console.clear();
             var neuronio = new pmc();
-            var lerDados = new ler();
-            neuronio.iniciar(0.1, 100000);
-            console.log(JSON.stringify(lerDados));
-
-            console.log(lerDados);
-    
-            neuronio.treinamento(lerDados.dados);
+            fileSelected = document.getElementById('txtfiletoread');
+            fileExtension = /.*/; //application/octet-stream //zz-application/zz-winassoc-dat
+            fileTobeRead = fileSelected.files[0];
+                    if(fileTobeRead != undefined){
+                        console.log("Mime type: "+fileTobeRead.type);        
+                        if (fileTobeRead.type.match(fileExtension)) {
+                            var fileReader = new FileReader();
+                            fileReader.onload = function () {
+                                var array = fileReader.result.split(/\r\n|\n/);
+                                var amostras = [];
+                                var y = array.indexOf("@data")+1;
+                                var x = 0;
+                                while(y<array.length){
+                                        let arraySlipt = array[y].split(",");
+                                        let output = arraySlipt.pop().trim();
+                                        let inputs = arraySlipt;
+                                        // PROVISÓRIO, TROCAR POR EQUIVALÊNCIA NUMÉRICA DOS CARACTERES
+                                        switch (output) {
+                                            case "Iris-setosa":
+                                                output = 1;
+                                                break;
+                                            case "Iris-versicolor":
+                                                output = 2;
+                                                break;
+                                            case "Iris-virginica":
+                                                output = 3;
+                                                break;
+                                            default:
+                                                output = 0;
+                                                break;
+                                        }
+                                        // PROVISÓRIO, TROCAR POR EQUIVALÊNCIA NUMÉRICA DOS CARACTERES
+                                        amostras[x] =   {
+                                                            inputs: inputs, 
+                                                            output: output
+                                                        };
+                                                        
+                                    y++;
+                                    x++;
+                                }
+                                if(amostras[parseInt(x-1)].inputs.length == 0){amostras.pop();}
+                                neuronio.iniciar(0.1, 100000);
+                                neuronio.treinamento(amostras);
+                            }
+                            fileReader.readAsText(fileTobeRead);
+                        }
+                        else {
+                            alert("Por favor selecione arquivo texto");
+                        }
+                    }
+                    else {
+                        alert("Por favor selecione um arquivo");
+                    }
+ 
             console.log("Resultado: " + neuronio.executar([-1, 0.9694, 0.6909, 0.4334, 3.4965]));
             console.log("Epocas: " + neuronio.showEpocas);
             var teste = [

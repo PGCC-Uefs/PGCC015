@@ -3,8 +3,6 @@
 // objeto de leitura dos arquivos .dat e execução do treinamento
 // Noberto Pires Maciel
 
-// OBSOLETO
-
 this.ler = function(){
         var leitura = this;
         // this.dados = [];
