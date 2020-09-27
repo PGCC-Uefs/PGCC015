@@ -15,6 +15,12 @@ this.pmc = function(){
      this.txAprendizagem = 0.1;
      this.precisao = 10**-6;
      this.eqm = 9999999999999999999999999999999999999999999999999; //eqm anterior
+     this.entradaCamada1 = [];
+     this.entradaCamada2 = [];
+     this.entradaCamada3 = [];
+     this.saidaCamada1 = [];
+     this.saidaCamada2 = [];
+     this.saidaCamada3 = [];
      this.funcaoAtivacao = function(u){
           // return 1 / (1 + Math.exp(-1 * u)); // sigmoid logística, AJUSTAR
           // derivada 1'*(1 + Math.exp(-1 * u))-1*(1 + Math.exp(-1 * u))'/(1 + Math.exp(-1 * u))^2
@@ -75,8 +81,10 @@ this.pmc = function(){
                eqmAnterior = eqmAtual;
                for(k=0;k<dados.length;k++){
                     // tem erro, deve calcular a saída do neuronio 1 para vários inputs*pesos
-                    let i1 = redeNeural.calcularU(dados[k].inputs); // I = Σ(X*W)
-                    let y1 = redeNeural.funcaoAtivacao(i1);
+                    for(i=0;dados[k].inputs.length;i++){
+                         redeNeural.entradaCamada1 = redeNeural.calcularU(dados[k].inputs); // I = Σ(X*W)
+                         saidaCamada1 = redeNeural.funcaoAtivacao(i1);
+                    }
 
                     let i2 = redeNeural.calcularU(y1);
                     let y2 = redeNeural.funcaoAtivacao(i2);
