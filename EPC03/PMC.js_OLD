@@ -15,7 +15,7 @@ this.pmc = function(){
      this.precisao = 10**-6;
      this.eqm = 0; //eqm anterior
      this.funcaoAtivacao = function(u){
-          return 1 / (1 + Math.exp(-1 * u)); // sigmoid
+          return 1 / (1 + Math.exp(-1 * u)); // sigmoid logística, AJUSTAR
           //redeNeural.u = u;
          // return (u >= 0? 1: -1); // sinal
      }
@@ -50,7 +50,7 @@ this.pmc = function(){
                eqm += eqm  + (dados[i].output-u)**2;
           }
           eqm = (eqm/amostras);
-          //console.log("Eqm(fi): "+eqm);
+          console.log("Eqm(fi): "+eqm);
           return eqm;
      }
      this.executar = function(inputs){
@@ -69,13 +69,15 @@ this.pmc = function(){
                for(i=0;i<dados.length;i++){
                     var u = redeNeural.calcularU(dados[i].inputs);
                     diferenca = dados[i].output - u;
-                    console.log(dados[i].output);
+                    console.log(dados[i].output); 
                     redeNeural.recalcularPesos(diferenca, dados[i].inputs);
                }
                numEpoca++;
                eqmAtual = redeNeural.calcularEqm(dados);
           }
           // apresenta na tela
+          // lança o valor da saída abaixo, dados[i].output, para novo treinamento na próxima camada
+          // as saídas devem ser armazenadas em vetor com elementos=neuroniosLen
           redeNeural.showEpocas = numEpoca;
           console.log("Pesos Finais:");
           for(z=0;z<tamPesos;z++){

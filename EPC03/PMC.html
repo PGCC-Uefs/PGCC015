@@ -55,6 +55,7 @@
                                 }
                                 if(amostras[parseInt(x-1)].inputs.length == 0){amostras.pop();}
                                 neuronio.iniciar(0.1, 100000);
+                                // aqui, laço executando o treinamento pelo número de entradas da amostra, inputs.length
                                 neuronio.treinamento(amostras);
                             }
                             fileReader.readAsText(fileTobeRead);
