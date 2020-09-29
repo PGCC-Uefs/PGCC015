@@ -31,69 +31,59 @@ this.pmc = function(){
                redeNeural.camada[k] = {neuronios: neuronios};
           }
      }
-     this.calcularU = function(dados,camada){
-          var neuronios = redeNeural.camada[camada].neuronios;
+     this.calcularU = function(dados,n){
+          var camada = redeNeural.camada[n].neuronios;
           var arraySaida = [];
-          for(i=0;i<neuronios.length;i++){
+          for(i=0;i<camada.length;i++){
                var soma = 0;
-               var pesos = neuronios[i].pesos;
+               var pesos = camada[i].pesos;
                for(j=0;j<pesos.length;j++){
                     soma += dados[j] * pesos[j];
                }
                arraySaida[i] = soma += redeNeural.bias;
-/*                alert(
-                    "# CalcularU #\n"+
-                    "Neurônio: "+i+
-                    "\nSoma: "+soma+
-                    "\ncamada:"+camada+
-                    "\nPesos: "+JSON.stringify(pesos)+
-                    "\nSaida camada 0: "+JSON.stringify(redeNeural.camada[0].outputs)+
-                    "\nSaida camada 1: "+JSON.stringify(redeNeural.camada[1].outputs)+
-                    "\nSaida camada 2: "+JSON.stringify(redeNeural.camada[2].outputs)
-               ); */
           }
-          redeNeural.camada[camada].outputs = arraySaida;
+          redeNeural.camada[n].outputsU = arraySaida;
      }
-     this.funcaoAtivacao = function(camada){
-          var neuronios = redeNeural.camada[camada];
+     this.funcaoAtivacao = function(n){
+          var camada = redeNeural.camada[n];
           var ativacao = [];
-          for(i=0;i<neuronios.outputs.length;i++){
-               ativacao[i] = 1*(-Math.exp(-1 * neuronios.outputs[i]))/(1 + Math.exp(-1 * neuronios.outputs[i]))**2;
+          for(i=0;i<camada.outputsU.length;i++){
+               ativacao[i] = 1*(-Math.exp(-1 * camada.outputsU[i]))/(1 + Math.exp(-1 * camada.outputsU[i]))**2;
           }
-          redeNeural.camada[camada].outputs = ativacao;
+          redeNeural.camada[n].outputs = ativacao;
      }
-     this.calculaGradiente = function(output,camada){
+     this.calculaGradiente = function(output,n){
           var gradiente = [];
-          var neuronios = redeNeural.camada[camada];
-          for(i=0;i<neuronios.outputs.length;i++){
-               gradiente[i] = (output-neuronios.outputs[i])*neuronios.outputs[i]; //gradiente saida 3 = -(dj³-Yj³)*g'(Ij³)
+          var camada = redeNeural.camada[n];
+          for(i=0;i<camada.outputs.length;i++){
+               gradiente[i] = (output-camada.outputs[i])*camada.outputs[i]; //gradiente saida 3 = -(dj³-Yj³)*g'(Ij³)
           }
-          redeNeural.camada[camada].gradiente = gradiente; // aqui é para substituir a chave e está apagando todo o neurônio
+          redeNeural.camada[n].gradiente = gradiente;
      }
-     this.recalcularPesos = function(camada){
-          var neuronios = redeNeural.camada[camada];
-          for(i=0;i<neuronios.length;i++){
-               var pesos = neuronios[i].pesos;
+     this.recalcularPesos = function(n){
+          var camada = redeNeural.camada[n];
+          for(i=0;i<camada.neuronios.length;i++){
+               var pesos = camada.neuronios[i].pesos;
                for(j=0;j<pesos.length;j++){
                     let momentum = 0; // INSERIR EQUAÇÃO
-                    pesos[j] = pesos[j] + momentum + redeNeural.txAprendizagem /* * neuronios.gradiente[i] */ /* rever este gradiente no array  */ * neuronios.outputs[i];
+                    pesos[j] = pesos[j] + momentum + redeNeural.txAprendizagem * camada.gradiente[i] * camada.outputs[i];
                }
-               neuronios[i] = {pesos: pesos};
+               camada.neuronios[i] = {pesos: pesos};
           }
-          redeNeural.camada[camada].neuronios = neuronios; // aqui é para substituir a chave e está apagando todo o neurônio
      }
-     this.calcularEqm = function(dados){
-          var eq = 0;
-          var amostras = redeNeural.camada[2].length;
+     this.calcularEqm = function(amostras){
+          var eq,u = 0;
+          var n = (redeNeural.camada.length-1);
+          alert("EQM: "+JSON.stringify(redeNeural.camada[n]));
           for(i=0;i<amostras.length;i++){
-               var u = redeNeural.calcularU(amostras[i].outputs,2);
+               u = redeNeural.camada[n].outputsU;
                eq += eq  + ((dados[i].output-u)**2)/2;
           }
           eq = (eq/amostras);
           return eq;
      }
-     this.executar = function(inputs,camada){
-          var u = redeNeural.calcularU(inputs,camada);
+     this.executar = function(inputs,n){
+          var u = redeNeural.calcularU(inputs,n);
           return redeNeural.funcaoAtivacao(u);
      }
      this.treinamento = function(dados){
@@ -105,17 +95,13 @@ this.pmc = function(){
           while((Math.abs(eqmAtual - eqmAnterior) > redeNeural.precisao)){
                eqmAnterior = eqmAtual;
                for(k=0;k<dados.length;k++){
-                    for(camada=0;camada<3;camada++){
-                         redeNeural.calcularU(dados[k].inputs,camada)
-                         alert("U:\nCamada: "+camada+" \nneuronios: "+JSON.stringify(redeNeural.camada[camada]));
-                         redeNeural.funcaoAtivacao(camada);
-                         alert("Ativação:\nCamada: "+camada+" \nneuronios: "+JSON.stringify(redeNeural.camada[camada]));
+                    for(n=0;n<3;n++){
+                         redeNeural.calcularU(dados[k].inputs,n)
+                         redeNeural.funcaoAtivacao(n);
                     }
-                    for(camada=2;camada>-1;camada--){
-                         redeNeural.calculaGradiente(dados[k].output,camada);
-                         alert("Gradiente:\nCamada: "+camada+" \nneuronios: "+JSON.stringify(redeNeural.camada[camada]));
-                         redeNeural.recalcularPesos(camada);
-                         alert("Recálculo pesos:\nCamada: "+camada+" \nneuronios: "+JSON.stringify(redeNeural.camada[camada]));
+                    for(n=2;n>=0;n--){
+                         redeNeural.calculaGradiente(dados[k].output,n);
+                         redeNeural.recalcularPesos(n);
                     }
                }
                eqmAtual = redeNeural.calcularEqm(dados);
