@@ -72,14 +72,15 @@ this.pmc = function(){
           }
      }
      this.calcularEqm = function(amostras){
-          var eq,u = 0;
+          var eq,soma = 0;
           var n = (redeNeural.camada.length-1);
+          var qtd = amostras.length;
           alert("EQM: "+JSON.stringify(redeNeural.camada[n]));
-          for(i=0;i<amostras.length;i++){
-               u = redeNeural.camada[n].outputsU;
-               eq += eq  + ((dados[i].output-u)**2)/2;
+          for(i=0;i<qtd;i++){
+               soma += amostras[i].output-redeNeural.camada[n].outputsU;
+               eq += eq  + (soma**2)/2;
           }
-          eq = (eq/amostras);
+          eq = (eq/qtd);
           return eq;
      }
      this.executar = function(inputs,n){
