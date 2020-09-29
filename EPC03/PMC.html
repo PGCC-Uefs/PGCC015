@@ -28,15 +28,19 @@
                                 var x = 0;
                                 var z = 0;
                                 while(y<array.length){
-                                        let arraySlipt = array[y].replace(/\s/g, '').split(",");
-                                        let inputs = arraySlipt;
-                                        let outputString = arraySlipt.pop().trim().toString();
-                                        let outputSplit = outputString.split("");
-                                        outputSplit = outputSplit.map(x => x.charCodeAt(0));
-                                        // rever cálculo do string para uso como saída padrão d(k)
-                                        var output = outputSplit.reduce(function(output, valor){
-                                            return output + valor;
-                                        }, 0);
+                                        var arraySlipt = array[y].replace(/\s/g, '').split(",");
+                                        var inputs = arraySlipt;
+                                        var outputString = arraySlipt.pop().trim().toString();
+                                        if(typeof outputString.match(/[a-z]|[A-Z]/g) != null){
+                                            var outputSplit = outputString.split("");
+                                            outputSplit = outputSplit.map(x => x.charCodeAt(0));
+                                            var output = outputSplit.reduce(function(output, valor){
+                                                return (output + valor);
+                                            }, 0);
+                                        }
+                                        else{
+                                            var output = outputString;
+                                        }
                                         amostras[x] =   {
                                                             inputs: inputs, 
                                                             output: output
