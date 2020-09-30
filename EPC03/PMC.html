@@ -55,7 +55,9 @@
                                 }
                                 if(amostras[parseInt(x-1)].inputs.length == 0){amostras.pop();}
                                 var entradas = amostras[0].inputs.length;
-                                var topologia = [entradas,3,2]; // número de camadas e neurônios da rede
+
+                                var topologia = [entradas,4,1]; // número de camadas e neurônios da rede
+                                
                                 neuronio.iniciar(0.1,topologia,classes);
                                 neuronio.treinamento(amostras);
                                 var i = 0;
@@ -87,6 +89,10 @@
         <button onclick="rodar();">Executar</button><br>
         <div>Conteúdo do arquivo:</div>
         <div id="filecontents">
+            <br>
+            EQM: <span id="eqm"></span><br>
+            Epocas: <span id="epocas"></span><br>
+            Tempo Execução: <span id="tempo"></span><br>
         </div>
     </body>
 </html>
