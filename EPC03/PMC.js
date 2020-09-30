@@ -7,18 +7,23 @@ console.log("PMC:");
 this.pmc = function(){
      var redeNeural = this;
      this.bias = -1;
-     this.numEpoca = 0;
-     this.showEpocas = 0;
+     this.p = 0; // quantidade de amostras
+     this.numEpocas = 0;
+     this.eqRede = [];
      this.txAprendizagem = 0.1;
      this.precisao = 10**-6;
      this.camada = [];
-     this.iniciar = function(txAprendizagem,numEpoca){
+     this.numCamadas = [];
+     this.classes = [];
+     this.iniciar = function(txAprendizagem,numCamadas,classes){
           redeNeural.txAprendizagem=txAprendizagem;
-          redeNeural.numEpoca=numEpoca;
+          redeNeural.classes = classes;
+          redeNeural.numCamadas = numCamadas;
      }
      this.iniciaPesos = function(entradas){
+          var camadas = redeNeural.numCamadas;
           console.log("Pesos iniciais:");
-          for(k=0;k<3;k++){
+          for(k=0;k<camadas;k++){
                var neuronios = [];
                for(j=0;j<entradas;j++){
                     var pesos = [];
@@ -31,7 +36,7 @@ this.pmc = function(){
                redeNeural.camada[k] = {neuronios: neuronios};
           }
      }
-     this.calcularU = function(dados,n){
+     this.calcularU = function(dados,n){ // falhando, neuronio indefinido no array, ajuste em redeNeural.executar()
           var camada = redeNeural.camada[n].neuronios;
           var arraySaida = [];
           for(i=0;i<camada.length;i++){
@@ -47,6 +52,7 @@ this.pmc = function(){
      this.funcaoAtivacao = function(n){
           var camada = redeNeural.camada[n];
           var ativacao = [];
+          console.log(n);
           for(i=0;i<camada.outputsU.length;i++){
                ativacao[i] = 1*(-Math.exp(-1 * camada.outputsU[i]))/(1 + Math.exp(-1 * camada.outputsU[i]))**2;
           }
@@ -71,46 +77,64 @@ this.pmc = function(){
                camada.neuronios[i] = {pesos: pesos};
           }
      }
-     this.calcularEqm = function(amostras){
-          var eq,soma = 0;
+     this.eqRede = function(dK){
+          var eqRede = 0;
+          var soma = 0;
           var n = (redeNeural.camada.length-1);
-          var qtd = amostras.length;
-          alert("EQM: "+JSON.stringify(redeNeural.camada[n]));
+          var qtd = redeNeural.camada[n].outputsU.length;
           for(i=0;i<qtd;i++){
-               soma += amostras[i].output-redeNeural.camada[n].outputsU;
-               eq += eq  + (soma**2)/2;
+               soma += dK-redeNeural.camada[n].outputsU[i];
           }
-          eq = (eq/qtd);
-          return eq;
+          return eqRede = (soma**2)/2;
      }
-     this.executar = function(inputs,n){
-          var u = redeNeural.calcularU(inputs,n);
-          return redeNeural.funcaoAtivacao(u);
+     this.calcularEqm = function(){
+          var soma = 0;
+          var camadas = redeNeural.numCamadas;
+          var p = redeNeural.p;
+          for(i=0;i<p;i++){
+               soma += redeNeural.eqRede[i];
+          }
+          return soma/p;
      }
      this.treinamento = function(dados){
           var numEpoca = 0;
           var eqmAnterior = 9999999999999999999999999999999999999999;
           var eqmAtual = 0;
+          var camadas = redeNeural.numCamadas;
           var qtdEntradas = dados[0].inputs.length;
+          redeNeural.p = dados.length;
           redeNeural.iniciaPesos(qtdEntradas);
           while((Math.abs(eqmAtual - eqmAnterior) > redeNeural.precisao)){
                eqmAnterior = eqmAtual;
-               for(k=0;k<dados.length;k++){
-                    for(n=0;n<3;n++){
+               for(k=0;k<redeNeural.p;k++){
+                    for(n=0;n<camadas;n++){
                          redeNeural.calcularU(dados[k].inputs,n)
                          redeNeural.funcaoAtivacao(n);
                     }
-                    for(n=2;n>=0;n--){
-                         redeNeural.calculaGradiente(dados[k].output,n);
-                         redeNeural.recalcularPesos(n);
+                    for(m=(camadas-1);m>=0;m--){
+                         redeNeural.calculaGradiente(dados[k].output,m);
+                         redeNeural.recalcularPesos(m);
                     }
+                    redeNeural.eqRede[k] = redeNeural.eqRede(dados[k].output);
                }
-               eqmAtual = redeNeural.calcularEqm(dados);
-               alert(eqmAtual);
+               eqmAtual = redeNeural.calcularEqm();
                numEpoca++;
+               console.log("EQM Total: "+eqmAtual);
+               console.log("EqRede: "+redeNeural.eqRede);
           }
-          redeNeural.showEpocas = numEpoca;
+          redeNeural.numEpocas = numEpoca;
+          console.log("Amostras: "+k);
           console.log("Epocas: "+numEpoca);
+     }
+     this.executar = function(dados){
+          var camadas = redeNeural.numCamadas;
+          for(k=0;k<dados.length;k++){
+               for(n=0;n<camadas;n++){
+                    redeNeural.calcularU(dados[k].inputs,n)
+                    redeNeural.funcaoAtivacao(n);
+               }
+               console.log(redeNeural.camada[camadas-1].outputs);
+          }
      }
 }
 
