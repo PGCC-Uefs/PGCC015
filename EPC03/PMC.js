@@ -23,7 +23,7 @@ this.pmc = function(){
           redeNeural.topologia = topologia;
           redeNeural.numCamadas = redeNeural.topologia.length;
           redeNeural.tempoExecucao[0] = Date.now();
-          console.log("Início: "+redeNeural.tempoExecucao[0]);
+          console.log("Início: "+redeNeural.tempoExecucao[0]+" milisegundos");
           console.log("Topologia: "+JSON.stringify(topologia));
      }
      this.iniciaPesos = function(){
@@ -52,7 +52,7 @@ this.pmc = function(){
                for(j=0;j<pesos.length;j++){
                     soma += dados[j] * pesos[j];
                }
-               arraySaida[i] = soma += redeNeural.bias;
+               (redeNeural.camada.length < n? arraySaida[i] = soma + redeNeural.bias : arraySaida[i] = soma);
           }
           redeNeural.camada[n].outputsU = arraySaida;
      }
@@ -68,9 +68,9 @@ this.pmc = function(){
      this.funcaoAtivacao = function(n){
           var camada = redeNeural.camada[n];
           var ativacao = [];
-          var beta = 0.5;
+          var b = 0.5;
           for(i=0;i<camada.outputsU.length;i++){
-               ativacao[i] = 1/(1 + Math.exp(-beta * camada.outputsU[i]));
+               ativacao[i] = 1/(1 + Math.exp(-b * camada.outputsU[i]));
           }
           redeNeural.camada[n].outputs = ativacao;
           redeNeural.derivada(n);
@@ -78,9 +78,9 @@ this.pmc = function(){
      this.derivada = function(n){
           var outputs = redeNeural.camada[n].outputs;
           var derivada = [];
-          var beta = 0.5;
+          var b = 0.5;
           for(i=0;i<outputs.length;i++){
-               derivada[i] = beta*outputs[i]*(1-outputs[i]);
+               derivada[i] = b*outputs[i]*(1-outputs[i]);
           }
           redeNeural.camada[n].outputs = derivada;
      }
@@ -144,6 +144,12 @@ this.pmc = function(){
                }
                eqmAtual = redeNeural.calcularEqm();
                numEpoca++;
+               redeNeural.tempoExecucao[1] = Date.now();
+               redeNeural.tempoExecucao[2] = redeNeural.tempoExecucao[1]-redeNeural.tempoExecucao[0];
+               document.getElementById("tempo").innerText = redeNeural.tempoExecucao[2];
+               document.getElementById("erro").innerText = Math.abs(eqmAtual - eqmAnterior);
+               document.getElementById("eqm").innerText = eqmAtual;
+               document.getElementById("epocas").innerText = numEpoca;
           }
           redeNeural.numEpocas = numEpoca;
           redeNeural.tempoExecucao[1] = Date.now();
