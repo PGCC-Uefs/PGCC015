@@ -8,23 +8,27 @@ this.pmc = function(){
      var redeNeural = this;
      this.bias = -1;
      this.p = 0; // quantidade de amostras
-     this.numEpocas = 0;
-     this.eqRede = [];
+     this.numEpocas = 1000000;
+     this.eq = [];
+     this.topologia = [];
      this.txAprendizagem = 0.1;
      this.precisao = 10**-6;
      this.camada = [];
      this.numCamadas = [];
      this.classes = [];
-     this.iniciar = function(txAprendizagem,numCamadas,classes){
+     this.iniciar = function(txAprendizagem,topologia,classes){
           redeNeural.txAprendizagem=txAprendizagem;
           redeNeural.classes = classes;
-          redeNeural.numCamadas = numCamadas;
+          redeNeural.topologia = topologia;
+          redeNeural.numCamadas = redeNeural.topologia.length;
+          console.log("Topologia: "+JSON.stringify(topologia));
      }
-     this.iniciaPesos = function(entradas){
-          var camadas = redeNeural.numCamadas;
+     this.iniciaPesos = function(){
           console.log("Pesos iniciais:");
+          var camadas = redeNeural.numCamadas;
           for(k=0;k<camadas;k++){
                var neuronios = [];
+               var entradas = redeNeural.topologia[k];
                for(j=0;j<entradas;j++){
                     var pesos = [];
                     for(i=0;i<entradas;i++){
@@ -36,7 +40,7 @@ this.pmc = function(){
                redeNeural.camada[k] = {neuronios: neuronios};
           }
      }
-     this.calcularU = function(dados,n){ // falhando, neuronio indefinido no array, ajuste em redeNeural.executar()
+     this.calcularU = function(dados,n){
           var camada = redeNeural.camada[n].neuronios;
           var arraySaida = [];
           for(i=0;i<camada.length;i++){
@@ -52,7 +56,6 @@ this.pmc = function(){
      this.funcaoAtivacao = function(n){
           var camada = redeNeural.camada[n];
           var ativacao = [];
-          console.log(n);
           for(i=0;i<camada.outputsU.length;i++){
                ativacao[i] = 1*(-Math.exp(-1 * camada.outputsU[i]))/(1 + Math.exp(-1 * camada.outputsU[i]))**2;
           }
@@ -89,40 +92,39 @@ this.pmc = function(){
      }
      this.calcularEqm = function(){
           var soma = 0;
-          var camadas = redeNeural.numCamadas;
           var p = redeNeural.p;
           for(i=0;i<p;i++){
-               soma += redeNeural.eqRede[i];
+               soma += redeNeural.eq[i];
           }
           return soma/p;
      }
      this.treinamento = function(dados){
           var numEpoca = 0;
-          var eqmAnterior = 9999999999999999999999999999999999999999;
+          var eqmAnterior = 9999999999999;
           var eqmAtual = 0;
           var camadas = redeNeural.numCamadas;
           var qtdEntradas = dados[0].inputs.length;
           redeNeural.p = dados.length;
           redeNeural.iniciaPesos(qtdEntradas);
-          while((Math.abs(eqmAtual - eqmAnterior) > redeNeural.precisao)){
+          while((Math.abs(eqmAtual - eqmAnterior) > redeNeural.precisao) && numEpoca < redeNeural.numEpocas){
                eqmAnterior = eqmAtual;
                for(k=0;k<redeNeural.p;k++){
                     for(n=0;n<camadas;n++){
-                         redeNeural.calcularU(dados[k].inputs,n)
+                         redeNeural.calcularU(dados[k].inputs,n);
                          redeNeural.funcaoAtivacao(n);
                     }
                     for(m=(camadas-1);m>=0;m--){
                          redeNeural.calculaGradiente(dados[k].output,m);
                          redeNeural.recalcularPesos(m);
                     }
-                    redeNeural.eqRede[k] = redeNeural.eqRede(dados[k].output);
+                    redeNeural.eq[k] = redeNeural.eqRede(dados[k].output);
                }
                eqmAtual = redeNeural.calcularEqm();
                numEpoca++;
-               console.log("EQM Total: "+eqmAtual);
-               console.log("EqRede: "+redeNeural.eqRede);
           }
           redeNeural.numEpocas = numEpoca;
+          console.log("EQM Total: "+eqmAtual);
+          console.log("Erro: "+Math.abs(eqmAtual - eqmAnterior));
           console.log("Amostras: "+k);
           console.log("Epocas: "+numEpoca);
      }

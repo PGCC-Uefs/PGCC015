@@ -54,9 +54,9 @@
                                         x++;
                                 }
                                 if(amostras[parseInt(x-1)].inputs.length == 0){amostras.pop();}
-                                console.log("Amostras:\n"+JSON.stringify(amostras));
-                                neuronio.iniciar(0.1,3,classes);
-                                // aqui, laço executando o treinamento pelo número de entradas da amostra, inputs.length
+                                var entradas = amostras[0].inputs.length;
+                                var topologia = [entradas,3,2]; // número de camadas e neurônios da rede
+                                neuronio.iniciar(0.1,topologia,classes);
                                 neuronio.treinamento(amostras);
                                 var i = 0;
                                 var teste = [
