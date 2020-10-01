@@ -56,10 +56,10 @@
                                         y++;
                                         x++;
                                 }
-                                if(amostras[parseInt(x-1)].inputs.length == 0){amostras.pop();}
-                                
+                                if(amostras[parseInt(x-1)].inputs.length < 2){amostras.pop();}
+                                document.getElementById("filecontents").innerHTML = JSON.stringify(amostras);
                                 var entradas = amostras[0].inputs.length;
-                                var topologia = [entradas,4,1]; // número de camadas e neurônios da rede
+                                var topologia = [3,4,1]; // número de camadas e neurônios da rede
                                 var txAprendizagem = 0.1;
                                 neuronio.iniciar(txAprendizagem,topologia,classes);
                                 neuronio.treinamento(amostras);
@@ -90,11 +90,14 @@
         <button onclick="rodar();">Iniciar Treinamento</button><br>
         <div>Conteúdo do arquivo:</div>
         <div id="filecontents">
-            <br>
+        </div>
+        <div id="dadosSaida">
+            <p>
             EQM: <span id="eqm"></span><br>
             Erro: <span id="erro"></span><br>
             Epocas: <span id="epocas"></span><br>
-            Tempo Execução: <span id="tempo"></span>ms<br>
+            Tempo Execução: <span id="tempo"></span>ms
+            </p>
         </div>
 <!--         <canvas id="myChart" width="400" height="400"></canvas>
         <script>
