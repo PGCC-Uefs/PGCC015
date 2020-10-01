@@ -59,13 +59,16 @@
                                 if(amostras[parseInt(x-1)].inputs.length < 2){amostras.pop();}
                                 document.getElementById("filecontents").innerHTML = JSON.stringify(amostras);
                                 var entradas = amostras[0].inputs.length;
-                                var topologia = [3,4,1]; // número de camadas e neurônios da rede
+                                var topologia = [4,4,2]; // número de camadas e neurônios da rede
                                 var txAprendizagem = 0.1;
                                 neuronio.iniciar(txAprendizagem,topologia,classes);
                                 neuronio.treinamento(amostras);
                                 var i = 0;
                                 var teste = [
-                                                {inputs: [6.0, 3.4, 4.5, 1.6]} // ler o arquivo .dat
+                                                {   
+                                                    //inputs: [5.1, 3.5, 1.4, 0.2],
+                                                    inputs: [7.0, 3.2, 4.7, 1.4]
+                                                }
                                             ];
                                 while(i < teste.length){
                                     console.log("Amostra Y"+(i+1)+": " + JSON.stringify(neuronio.executar(teste[i])));
@@ -88,17 +91,17 @@
         Selecione o arquivo .dat:
         <input type="file" id="txtfiletoread" /><br />
         <button onclick="rodar();">Iniciar Treinamento</button><br>
-        <div>Conteúdo do arquivo:</div>
-        <div id="filecontents">
-        </div>
         <div id="dadosSaida">
             <p>
+            Saída: <span id="saida"></span><br>
             EQM: <span id="eqm"></span><br>
             Erro: <span id="erro"></span><br>
             Epocas: <span id="epocas"></span><br>
             Tempo Execução: <span id="tempo"></span>ms
             </p>
         </div>
+        <p>Conteúdo do arquivo:</p>
+        <p id="filecontents"></p>
 <!--         <canvas id="myChart" width="400" height="400"></canvas>
         <script>
         var ctx = document.getElementById('myChart').getContext('2d');
