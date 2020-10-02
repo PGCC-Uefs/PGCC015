@@ -36,7 +36,7 @@ this.pmc = function(){
                var wbefore = [];
                var topologia = redeNeural.topologia[k];
                for(j=0;j<topologia;j++){
-                    (k==0? entradas = qtdEntradas: entradas = redeNeural.topologia[k-1]);
+                    (k > 0? entradas = redeNeural.topologia[k-1] : entradas = qtdEntradas);
                     var pesos = [];
                     for(i=0;i<entradas;i++){
                          pesos[i] = Math.random()/2;
