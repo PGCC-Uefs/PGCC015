@@ -31,8 +31,8 @@
                                 var z = 0;
                                 while(y<array.length){
                                         var arraySlipt = array[y].replace(/\s/g, '').split(",");
-                                        var inputs = arraySlipt;
                                         var outputString = arraySlipt.pop().trim().toString();
+                                        var inputs = arraySlipt.map(x => parseFloat(x));
                                         if(typeof outputString.match(/[a-z]|[A-Z]/g) != null){  // se output for alfanumérico
                                             var outputSplit = outputString.split("");
                                             outputSplit = outputSplit.map(x => x.charCodeAt(0));
@@ -57,21 +57,25 @@
                                         x++;
                                 }
                                 if(amostras[parseInt(x-1)].inputs.length < 2){amostras.pop();}
-                                document.getElementById("filecontents").innerHTML = JSON.stringify(amostras);
-                                var entradas = amostras[0].inputs.length;
-                                var topologia = [4,4,2]; // número de camadas e neurônios da rede
+                                //document.getElementById("filecontents").innerHTML = JSON.stringify(amostras);
+                                var entrada = amostras[0].inputs.length-1;
+                                var oculta = 4;
+                                var saida = 3;
+                                var topologia = [entrada,oculta,saida]; // número de camadas e neurônios da rede
                                 var txAprendizagem = 0.1;
                                 neuronio.iniciar(txAprendizagem,topologia,classes);
                                 neuronio.treinamento(amostras);
                                 var i = 0;
                                 var teste = [
                                                 {   
-                                                    //inputs: [5.1, 3.5, 1.4, 0.2],
-                                                    inputs: [7.0, 3.2, 4.7, 1.4]
+                                                    inputs: [5.1, 3.5, 1.4, 0.2],
+                                                    //inputs: [7.0, 3.2, 4.7, 1.4],
+                                                    //inputs: [6.7, 3.3, 5.7, 2.5]
                                                 }
                                             ];
                                 while(i < teste.length){
-                                    console.log("Amostra Y"+(i+1)+": " + JSON.stringify(neuronio.executar(teste[i])));
+                                    neuronio.executar(teste[i]);
+                                    //console.log("Amostra Y"+(i+1)+": " + JSON.stringify(neuronio.executar(teste[i])));
                                     i++;
                                 }
                             }

@@ -34,8 +34,9 @@ this.pmc = function(){
                var neuronios = [];
                var topologia = redeNeural.topologia[k];
                for(j=0;j<topologia;j++){
+                    (k==0? entradas = qtdEntradas: entradas = redeNeural.topologia[k-1]);
                     var pesos = [];
-                    for(i=0;i<qtdEntradas;i++){
+                    for(i=0;i<entradas;i++){
                          pesos[i] = Math.random()/2;
                          console.log("Camada: "+k+" wi"+i+": "+pesos[i]);
                     }
@@ -82,7 +83,8 @@ this.pmc = function(){
           var gradiente = [];
           var camada = redeNeural.camada[n];
           for(i=0;i<camada.outputs.length;i++){
-               gradiente[i] = (output-camada.outputs[i])*camada.derivada[i]; //gradiente saida 3 = -(dj³-Yj³)*g'(Ij³)
+               gradiente[i] = -(output-camada.outputs[i])*camada.derivada[i]; //gradiente saida 3 = -(dj³-Yj³)*g'(Ij³)
+               //alert(gradiente[i]+" - "+output);
           }
           redeNeural.camada[n].gradiente = gradiente;
           //document.getElementById("dadosSaida").append("\ncamada: "+n+"\ngradiente: "+JSON.stringify(redeNeural.camada[n])+"\n\n");
@@ -93,7 +95,7 @@ this.pmc = function(){
                var saida = [];
                var pesos = camada.neuronios[i].pesos;
                (n==0? saida = inputs : saida = redeNeural.camada[n-1].outputs);
-               for(j=0;j<saida.length;j++){
+               for(j=0;j<pesos.length;j++){
                     let alfa = redeNeural.alfa;
                     let ngy = pesos[j] + redeNeural.txAprendizagem * camada.gradiente[i] * saida[i];
                     let momentum = alfa*(ngy - pesos[j]);
@@ -168,9 +170,10 @@ this.pmc = function(){
                     redeNeural.calcularU(dados[k].inputs,n);
                     redeNeural.funcaoAtivacao(n);
                }
-               console.log(redeNeural.camada[camadas-1].outputs);
           }
+          console.log(redeNeural.camada[camadas-1].outputs);
           return redeNeural.camada[camadas-1].outputs;
      }
+
 }
 
