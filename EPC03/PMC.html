@@ -62,20 +62,18 @@
                                 var oculta = 4;
                                 var saida = 3;
                                 var topologia = [entrada,oculta,saida]; // número de camadas e neurônios da rede
+                                document.getElementById("topologia").innerText = JSON.stringify(topologia);
                                 var txAprendizagem = 0.1;
                                 neuronio.iniciar(txAprendizagem,topologia,classes);
                                 neuronio.treinamento(amostras);
                                 var i = 0;
                                 var teste = [
-                                                {   
-                                                    inputs: [5.1, 3.5, 1.4, 0.2],
-                                                    //inputs: [7.0, 3.2, 4.7, 1.4],
-                                                    //inputs: [6.7, 3.3, 5.7, 2.5]
-                                                }
+                                                    //{inputs: [5.1, 3.5, 1.4, 0.2]},
+                                                    //{inputs: [7.0, 3.2, 4.7, 1.4]},
+                                                    {inputs: [6.7, 3.3, 5.7, 2.5]}
                                             ];
                                 while(i < teste.length){
-                                    neuronio.executar(teste[i]);
-                                    //console.log("Amostra Y"+(i+1)+": " + JSON.stringify(neuronio.executar(teste[i])));
+                                    console.log("Amostra Y"+(i+1)+": " + JSON.stringify(neuronio.executar(teste[i])));
                                     i++;
                                 }
                             }
@@ -97,6 +95,7 @@
         <button onclick="rodar();">Iniciar Treinamento</button><br>
         <div id="dadosSaida">
             <p>
+            Topologia: <span id="topologia"></span><br>
             Saída: <span id="saida"></span><br>
             EQM: <span id="eqm"></span><br>
             Erro: <span id="erro"></span><br>
