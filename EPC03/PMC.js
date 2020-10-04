@@ -84,7 +84,7 @@ this.pmc = function(){
           var l = 1;               // valor máximo da curva
           var e = redeNeural.e;
           for(i=0;i<outputs.length;i++){
-               derivada[i] = (e**-outputs[i])*(l+(e**-outputs[i]))**2;
+               derivada[i] = outputs[i]*(1-outputs[i]);//(e**-outputs[i])*(l+(e**-outputs[i]))**2;
           }
           redeNeural.camada[n].derivada = derivada;
      }
