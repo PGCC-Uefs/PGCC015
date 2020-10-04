@@ -1,4 +1,5 @@
-@relation winequality-white
+@relation winequality
+-white
 @attribute FixedAcidity real[3.8,14.2]
 @attribute VolatileAcidity real[0.08,1.1]
 @attribute CitricAcid real[0.0,1.66]
