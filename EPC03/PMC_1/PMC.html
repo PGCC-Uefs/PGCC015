@@ -43,7 +43,6 @@
                                         if(classes.indexOf(outputString) === -1){
                                             classes.push(outputString);
                                         }
-                                        inputs.unshift(neuronio.bias);
                                         amostras[x] =   {
                                                             inputs: inputs, 
                                                             output: outputString
@@ -51,9 +50,10 @@
                                         y++;
                                         x++;
                                 }
+                                
                                 for(i=0;i<classes.length;i++){
                                     var bin = "";
-                                    bin = bin.padStart(classes.length-1, "0").split("");
+                                    bin = bin.padStart(classes.length, "0").split("");
                                     bin[i]="1";
                                     bin = bin.join("");
                                     classes[i] = {
@@ -70,7 +70,7 @@
                                 classes.pop();
                                 document.getElementById("classes").innerHTML = JSON.stringify(classes);
                                 document.getElementById("amostras").innerHTML = JSON.stringify(amostras);
-                                var entrada = amostras[0].inputs.length-1;
+                                var entrada = amostras[0].inputs.length;
                                 var oculta = 4;
                                 var saida = classes.length;
                                 var topologia = [entrada,oculta,saida];
