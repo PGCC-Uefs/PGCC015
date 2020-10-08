@@ -9,6 +9,49 @@
         <meta http-equiv="expires" content="0" />
         <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
         <meta http-equiv="pragma" content="no-cache" />
+        <style>
+            #pausaDeTelaDivIndex{
+                display: none;
+                position:absolute;    
+                width: 100%;
+                height: 100%;       
+                z-index:100;
+                margin-left: 0px;
+                margin-top: 0px;
+                border: 0;
+                overflow: hidden;
+                text-align: center;
+            }
+
+            #pausaDeTelaDivCentroIndex{
+                display: block;
+                position:absolute;    
+                width: 200px;
+                height: 100px;       
+                z-index:99;
+                margin-left: -100px;
+                margin-top: -50px;
+                left: 50%;
+                top: 50%;    
+                background:#000000;
+                background-color: rgba(0, 0, 0, 0); 
+                border: 0;
+                overflow: hidden;
+                text-align: center;
+                border-radius: 7px;
+            }
+            .progressbar {
+                position: absolute;
+                width: 116px;
+                height: 65px;
+                left: 50%;
+                top: 50%;
+                margin-left: -58px;
+                margin-top: -33px;
+                color: rgba(255,255,255,1);
+                border: 0;
+            }
+        </style>
         <title>Perceptron Multicamadas - EPC03 - PGCC 2020.1</title>
         <script src="PMC.js"></script>
         <script>
@@ -25,6 +68,10 @@
                 array = array.map(x => parseFloat((x-min)/(max-min)));
             }
             return array;
+        }
+        function bloquear(){
+            document.getElementById("pausaDeTelaDivIndex").style.display = "block";
+            document.getElementById("btn").setAttribute("disabled","disabled");
         }
         function rodar(){
             console.clear();
@@ -86,8 +133,8 @@
                                 var oculta = amostras[0].inputs.length;
                                 var saida = classes.length;
                                 var topologia = [entrada,saida];
-                                if(typeof momentum != undefined && momentum > 0){
-                                    neuronio.alfa = 0;
+                                if(typeof momentum == undefined){
+                                    momentum = 0;
                                 }
                                 if(typeof neuronios != undefined && neuronios > 0){
                                     oculta = neuronios;
@@ -100,120 +147,121 @@
                                 }
                                 document.getElementById("topologia").innerText = JSON.stringify(topologia);
                                 var txAprendizagem = 0.1;
-                                neuronio.iniciar(txAprendizagem,topologia,classes);
-                                neuronio.treinamento(amostras);
-                                relation = relation.split(" ");
 
-                                var datasets = [{
-                                    iris: [ 
-                                    //iris
-                                    {inputs: [5.0, 3.6, 1.4, 0.2]},
-                                    {inputs: [4.8, 3.4, 1.6, 0.2]},
-                                    {inputs: [5.4, 3.9, 1.3, 0.4]},
-                                    {inputs: [5.1, 3.5, 1.4, 0.3]},
-                                    {inputs: [4.8, 3.4, 1.9, 0.2]},
-                                    {inputs: [5.2, 3.5, 1.5, 0.2]},
-                                    {inputs: [5.2, 3.4, 1.4, 0.2]},
-                                    {inputs: [4.5, 2.3, 1.3, 0.3]},
-                                    {inputs: [5.1, 3.8, 1.9, 0.4]},
-                                    {inputs: [6.1, 2.9, 4.7, 1.4]},
-                                    {inputs: [5.6, 2.9, 3.6, 1.3]},
-                                    {inputs: [6.7, 3.1, 4.4, 1.4]},
-                                    {inputs: [5.6, 2.5, 3.9, 1.1]},
-                                    {inputs: [5.9, 3.2, 4.8, 1.8]},
-                                    {inputs: [5.4, 3.0, 4.5, 1.5]},
-                                    {inputs: [6.1, 3.0, 4.6, 1.4]},
-                                    {inputs: [5.8, 2.6, 4.0, 1.2]},
-                                    {inputs: [5.7, 3.0, 4.2, 1.2]},
-                                    {inputs: [6.2, 2.9, 4.3, 1.3]},
-                                    {inputs: [7.6, 3.0, 6.6, 2.1]},
-                                    {inputs: [4.9, 2.5, 4.5, 1.7]},
-                                    {inputs: [6.7, 2.5, 5.8, 1.8]},
-                                    {inputs: [7.7, 2.8, 6.7, 2.0]},
-                                    {inputs: [6.3, 3.4, 5.6, 2.4]},
-                                    {inputs: [6.9, 3.1, 5.4, 2.1]},
-                                    {inputs: [6.7, 3.1, 5.6, 2.4]},
-                                    {inputs: [6.8, 3.2, 5.9, 2.3]},
-                                    {inputs: [6.7, 3.3, 5.7, 2.5]},
-                                    {inputs: [4.4, 3.2, 1.3, 0.2]},
-                                    {inputs: [6.0, 2.2, 5.0, 1.5]},
-                                    {inputs: [4.7, 3.2, 1.3, 0.2]},
-                                    {inputs: [4.9, 3.1, 1.5, 0.1]},
-                                    {inputs: [5.8, 4.0, 1.2, 0.2]},
-                                    {inputs: [4.4, 3.2, 1.3, 0.2]},
-                                    {inputs: [5.0, 3.5, 1.6, 0.6]},
-                                    {inputs: [6.5, 2.8, 4.6, 1.5]},
-                                    {inputs: [6.6, 2.9, 4.6, 1.3]},
-                                    {inputs: [6.8, 2.8, 4.8, 1.4]},
-                                    {inputs: [6.0, 2.9, 4.5, 1.5]},
-                                    {inputs: [6.0, 3.4, 4.5, 1.6]},
-                                    {inputs: [6.5, 3.0, 5.5, 1.8]},
-                                    {inputs: [7.7, 2.6, 6.9, 2.3]},
-                                    {inputs: [6.0, 2.2, 5.0, 1.5]},
-                                    {inputs: [6.9, 3.2, 5.7, 2.3]},
-                                    {inputs: [6.2, 2.8, 4.8, 1.8]}
-                                    ],
-                                    glass: [ 
-                                    //glass
-                                        {inputs: [1.51588824, 12.87795, 3.43036, 1.40066, 73.282, 0.68931, 8.04468, 0.0, 0.1224]}, //1
-                                        {inputs: [1.51839404, 12.85135, 3.66833, 1.24016, 72.5708, 0.621, 8.67952, 0.0, 0.1785]}, //2
-                                        {inputs: [1.51663998, 13.1373, 3.44832, 1.76018, 72.4812, 0.60237, 8.37824, 0.0, 0.0867]} //3
-                                    ],
-                                    winequality: [ 
-                                    //wine
-                                        {inputs: [7.0,0.27,0.36,20.7,0.045,45.0,170.0,1.001,3.0,0.45,8.8]}, //6
-                                        {inputs: [8.6,0.23,0.4,4.2,0.035,17.0,109.0,0.9947,3.14,0.53,9.7]}, //5
-                                        {inputs: [6.2,0.66,0.48,1.2,0.029,29.0,75.0,0.9892,3.33,0.39,12.8]} //8
-                                    ]
-                                }];
-                                //alert(JSON.stringify(datasets[0].iris[0].inputs));
-/*                                 if(fileReader.result.match("@relation iris")){
-                                    executar(datasets[0].iris);
-                                }
-                                else if(fileReader.result.match("@relation glass")){
-                                    executar(datasets[0].glass);
-                                }
-                                else if(fileReader.result.match("@relation winequality")){
-                                    executar(datasets[0].winequality);
-                                }
-                                else{
-                                    alert("Selecione um arquivo válido!");
-                                }
+                                // laço dos folds aqui
+                                var folds = [];
+                                                    neuronio.iniciar(txAprendizagem,topologia,classes,momentum);
+                                                    neuronio.treinamento(amostras);
+                                                    relation = relation.split(" ");
 
-                                function executar(teste){
-                                    var data = [];
-                                    for(i=0;i<teste.length;i++){
-                                        alert(JSON.stringify(teste.inputs));
-                                        var inputs = teste.inputs;
-                                        //var inputs = normalizar(teste.inputs);
-                                        //inputs.unshift(neuronio.bias);
-                                        data[i] = {inputs: inputs}
-                                    }
-                                    neuronio.executar(data);
-                                } */
-                                var data = [];
-                                for(i=0;i<datasets[0].iris.length;i++){
-                                    var inputs = normalizar(datasets[0].iris[i].inputs);
-                                    inputs.unshift(neuronio.bias);
-                                    data[i] = {inputs: inputs}
-                                }
+                                                    
+                                                    var datasets = [{
+                                                        iris: [ 
+                                                        //iris
+                                                        {inputs: [5.0, 3.6, 1.4, 0.2]},
+                                                        {inputs: [4.8, 3.4, 1.6, 0.2]},
+                                                        {inputs: [5.4, 3.9, 1.3, 0.4]},
+                                                        {inputs: [5.1, 3.5, 1.4, 0.3]},
+                                                        {inputs: [4.8, 3.4, 1.9, 0.2]},
+                                                        {inputs: [5.2, 3.5, 1.5, 0.2]},
+                                                        {inputs: [5.2, 3.4, 1.4, 0.2]},
+                                                        {inputs: [4.5, 2.3, 1.3, 0.3]},
+                                                        {inputs: [5.1, 3.8, 1.9, 0.4]},
+                                                        {inputs: [6.1, 2.9, 4.7, 1.4]},
+                                                        {inputs: [5.6, 2.9, 3.6, 1.3]},
+                                                        {inputs: [6.7, 3.1, 4.4, 1.4]},
+                                                        {inputs: [5.6, 2.5, 3.9, 1.1]},
+                                                        {inputs: [5.9, 3.2, 4.8, 1.8]},
+                                                        {inputs: [5.4, 3.0, 4.5, 1.5]},
+                                                        {inputs: [6.1, 3.0, 4.6, 1.4]},
+                                                        {inputs: [5.8, 2.6, 4.0, 1.2]},
+                                                        {inputs: [5.7, 3.0, 4.2, 1.2]},
+                                                        {inputs: [6.2, 2.9, 4.3, 1.3]},
+                                                        {inputs: [7.6, 3.0, 6.6, 2.1]},
+                                                        {inputs: [4.9, 2.5, 4.5, 1.7]},
+                                                        {inputs: [6.7, 2.5, 5.8, 1.8]},
+                                                        {inputs: [7.7, 2.8, 6.7, 2.0]},
+                                                        {inputs: [6.3, 3.4, 5.6, 2.4]},
+                                                        {inputs: [6.9, 3.1, 5.4, 2.1]},
+                                                        {inputs: [6.7, 3.1, 5.6, 2.4]},
+                                                        {inputs: [6.8, 3.2, 5.9, 2.3]},
+                                                        {inputs: [6.7, 3.3, 5.7, 2.5]},
+                                                        {inputs: [4.4, 3.2, 1.3, 0.2]},
+                                                        {inputs: [6.0, 2.2, 5.0, 1.5]}
+                                                        ],
+                                                        glass: [ 
+                                                        //glass
+                                                            {inputs: [1.51588824, 12.87795, 3.43036, 1.40066, 73.282, 0.68931, 8.04468, 0.0, 0.1224]}, //1
+                                                            {inputs: [1.51839404, 12.85135, 3.66833, 1.24016, 72.5708, 0.621, 8.67952, 0.0, 0.1785]}, //2
+                                                            {inputs: [1.51663998, 13.1373, 3.44832, 1.76018, 72.4812, 0.60237, 8.37824, 0.0, 0.0867]} //3
+                                                        ],
+                                                        winequality: [ 
+                                                        //wine
+                                                            {inputs: [7.0,0.27,0.36,20.7,0.045,45.0,170.0,1.001,3.0,0.45,8.8]}, //6
+                                                            {inputs: [8.6,0.23,0.4,4.2,0.035,17.0,109.0,0.9947,3.14,0.53,9.7]}, //5
+                                                            {inputs: [6.2,0.66,0.48,1.2,0.029,29.0,75.0,0.9892,3.33,0.39,12.8]} //8
+                                                        ]
+                                                        }];
 
-                                //alert(JSON.stringify(data));
-                                neuronio.executar(data);
+                                                                    /*  if(fileReader.result.match("@relation iris")){
+                                                                        executar(datasets[0].iris);
+                                                                    }
+                                                                    else if(fileReader.result.match("@relation glass")){
+                                                                        executar(datasets[0].glass);
+                                                                    }
+                                                                    else if(fileReader.result.match("@relation winequality")){
+                                                                        executar(datasets[0].winequality);
+                                                                    }
+                                                                    else{
+                                                                        alert("Selecione um arquivo válido!");
+                                                                    }
+
+                                                                    function executar(teste){
+                                                                        var data = [];
+                                                                        for(i=0;i<teste.length;i++){
+                                                                            alert(JSON.stringify(teste.inputs));
+                                                                            var inputs = teste.inputs;
+                                                                            //var inputs = normalizar(teste.inputs);
+                                                                            //inputs.unshift(neuronio.bias);
+                                                                            data[i] = {inputs: inputs}
+                                                                        }
+                                                                        neuronio.executar(data);
+                                                                    } */
+
+                                                        var data = [];
+                                                        for(i=0;i<datasets[0].iris.length;i++){
+                                                            var inputs = normalizar(datasets[0].iris[i].inputs);
+                                                            inputs.unshift(neuronio.bias);
+                                                            data[i] = {inputs: inputs}
+                                                        }
+                                                        neuronio.executar(data);
+                                document.getElementById("pausaDeTelaDivIndex").style.display = "none";
+                                document.getElementById("btn").removeAttribute("disabled");
                             }
                             fileReader.readAsText(fileTobeRead);
                         }
                         else {
+                            document.getElementById("pausaDeTelaDivIndex").style.display = "none";
+                            document.getElementById("btn").removeAttribute("disabled");
                             alert("Por favor selecione arquivo texto");
                         }
                     }
                     else {
+                        document.getElementById("pausaDeTelaDivIndex").style.display = "none";
+                        document.getElementById("btn").removeAttribute("disabled");
                         alert("Por favor selecione um arquivo");
                     }
         }
         </script>
     </head>
     <body>
+        <div id="pausaDeTelaDivIndex">
+            <div id="pausaDeTelaDivCentroIndex">
+                <img src="pgcc.png" class="progressbar">
+                aguarde o processamento...
+            </div>
+        </div>
+        <div id="dadosSaida">
         <table>
             <tr>
                 <td>
@@ -230,25 +278,26 @@
             <tr>
                 <td>
                     quantidade de camadas ocultas:<br />
-                    <input type="number" id="ocultas" value="1"  min="1" max="10">
+                    <input type="number" id="ocultas" value="1"  min="1" max="20">
                 </td>
             </tr>
             <tr>
                 <td>
                     quantidade de neurônios nas camadas ocultas:<br />
-                    <input type="number" id="neuronios" value="3"  min="1" max="10">
+                    <input type="number" id="neuronios" value="3"  min="3" max="20">
                 </td>
             </tr>
         </table>
-        <button onclick="rodar();">Iniciar</button><br>
-        <div id="dadosSaida">
+        <button onclick="bloquear();rodar();" id="btn">Iniciar</button><br>
             <p>
             Topologia: <span id="topologia"></span><br>
             Saída treinamento: <span id="saida"></span><br>
+            Termo de momentum (valor de α): <span id="termomomentum"></span><br>
             EQM treinamento: <span id="eqm"></span><br>
             Erro treinamento: <span id="erro"></span><br>
             Epocas treinamento: <span id="epocas"></span><br>
-            Tempo Execução treinamento: <span id="tempo"></span>ms
+            Tempo Execução treinamento: <span id="tempo"></span>ms<br>
+            <font size="2pt">**A normalização é feita automaticamente para amostras com valores máximos acima de 1.</font>
             </p>
         </div>
         <p id="classes"></p>
