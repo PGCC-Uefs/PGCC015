@@ -7,17 +7,17 @@ console.log("PMC:");
 this.pmc = function(){
      var redeNeural = this;
      this.bias = -1;
-     this.k = 1;               // declividade
+     this.beta = 0.5;               // declividade
      this.x0 = 0;              // ponto médio da curva sigmoide
      this.l = 1;
      this.amostras = []; 
-     this.numEpocas = 10**4;
+     this.numEpocas = 10**6;
      this.erro = [];
      this.topologia = [];
      this.txAprendizagem = 0.1;
      this.precisao = 10**-6;
-     this.e = 2.718281828;
-     this.alfa = 0.5; // alfa do termo de momentum
+     this.e = 2.718281828459045;
+     this.alfa = 0.1; // alfa do termo de momentum
      this.sinalGradiente = 1;
      this.camada = [];
      this.wbefore = [];
@@ -34,15 +34,14 @@ this.pmc = function(){
           console.log("Topologia: "+JSON.stringify(topologia));
      }
      this.iniciaPesos = function(qtdEntradas){
-          //console.log("Pesos iniciais:");
           var camadas = redeNeural.numCamadas;
           var pesosPorCamada = [];
           for(k=0;k<camadas;k++){
                var neuronios = [];
                var topologia = redeNeural.topologia[k];
+               var entradas = qtdEntradas;
+               if(k > 0){entradas = redeNeural.topologia[k-1]+1;}
                for(j=0;j<topologia;j++){
-                    if(k == 0 || k == redeNeural.topologia[redeNeural.topologia.length-1]){entradas = qtdEntradas}
-                    else{entradas = topologia+1}
                     var pesos = [];
                     for(i=0;i<entradas;i++){
                          pesos[i] = Math.random()/2;
@@ -53,94 +52,92 @@ this.pmc = function(){
                }
                redeNeural.camada[k] = {neuronios: neuronios, wbefore: neuronios};
           }
-          //console.log("pesos por camada: "+JSON.stringify(pesosPorCamada));
      }
-     this.calcularU = function(dados,n){
-          var camada = redeNeural.camada[n].neuronios;
-          var qtdNeuronios = camada.length;
+     this.calcularU = function(inputs,n){
+          var neuronio = redeNeural.camada[n].neuronios;
+          var qtdNeuronios = neuronio.length;
           var arraySaida = [];
-          var apresenta = "";
-          if(n>0){dados = redeNeural.camada[n-1].outputs; apresenta = redeNeural.camada[n-1].outputs};
-          //console.log("calcularU, entrada camada: "+n+"\noutputs["+(n-1)+"]: "+JSON.stringify(apresenta[0])+"\nqtdNeuronios: "+qtdNeuronios+"\ndadosNeuronios: "+JSON.stringify(redeNeural.camada[n]));
-          for(z=0;z<dados.length;z++){
-               for(i=0;i<qtdNeuronios;i++){
+          var tam = inputs.length;
+          for(i=0;i<qtdNeuronios;i++){
                     var soma = 0;
-                    var pesos = camada[n].pesos;
-                    //console.log("calcularU laço 1: \nn="+n+"\nneuronio: "+i+"\npesos: "+JSON.stringify(pesos));
-                    for(j=0;j<pesos.length;j++){
-                         soma += dados[z] * pesos[j];
-                         //console.log("U laço 2: \nC="+n+"\nN:"+i+"\nI["+z+"]:"+dados[z]+"\nP["+j+"]:"+pesos[j]+"\nS:"+soma);
-                                             //console.log("pesos: "+JSON.stringify(pesos));
+                    var y = 0;
+                    var pesos = neuronio[i].pesos;
+                    for(j=0;j<tam;j++){
+                         soma += inputs[j] * pesos[j+y];
+                         //alert("Camada: "+n+"\nNeurônio: "+i+"\ninputs["+j+"]: "+inputs[j]+"\npesos["+(y+j)+"]: "+pesos[y+j]);
                     }
-                    (n==redeNeural.camada.length-1? arraySaida[i] = soma : arraySaida[i] = soma + redeNeural.bias);
-               }
+                    y += j;
+                    arraySaida[i] = soma; //+ redeNeural.bias;
           }
           redeNeural.camada[n].outputsU = arraySaida;
-          //console.log("calcularU saída camada: n="+n+"\noutputsU: "+JSON.stringify(redeNeural.camada[n].outputsU)+"\ndados: "+JSON.stringify(dados));
+          //alert(JSON.stringify(redeNeural.camada[n].outputsU));
+          //console.log("calcularU saída camada: n="+n+"\noutputsU: "+JSON.stringify(redeNeural.camada[n].outputsU)+"\ndados: "+JSON.stringify(inputs));
      }
      this.funcaoAtivacao = function(n){
           var neuronios = redeNeural.camada[n];
           var ativacao = [];
-          var k = redeNeural.k;               // declividade
+          var beta = redeNeural.beta;               // declividade
           var x0 = redeNeural.x0;              // ponto médio da curva sigmoide
           var l = redeNeural.l;               // valor máximo da curva
           var e = redeNeural.e;    // número neperiano
           for(i=0;i<neuronios.outputsU.length;i++){
-               ativacao[i] = l/(1 + e*Math.exp(-k*(neuronios.outputsU[i]-x0)));
+               ativacao[i] = l/(1 + e**(-beta*(neuronios.outputsU[i]-x0)));
+               //ativacao[i] = l/(1 + Math.exp(-beta*(neuronios.outputsU[i]-x0)));
           }
           redeNeural.camada[n].outputs = ativacao;
-          //console.log(JSON.stringify("Funçao ativação camada: "+n+"\noutputs: "+redeNeural.camada[n].outputs)+"\nNeuronios: "+JSON.stringify(redeNeural.camada[n].neuronios));
      }
-     this.dSigmoid = function(n){
+     this.derivadaSigmoid = function(n){
           var outputs = redeNeural.camada[n].outputs;
-          var dSigmoid = [];
-          var k = redeNeural.k;               // declividade
+          var derivadaSigmoid = [];
+          var beta = redeNeural.beta;               // declividade
           var l = redeNeural.l;               // valor máximo da curva
           var e = redeNeural.e;              // número neperiano
           for(i=0;i<outputs.length;i++){
-               dSigmoid[i] = k*outputs[i]*(1-outputs[i]); //k*(e**-k*outputs[i])/(((e**-k*outputs[i])+1)**2); //(e**-outputs[i])*(l+(e**-outputs[i]))**2; //outputs[i]*(1-outputs[i]); //outputs[i]*(1-outputs[i]);
+               derivadaSigmoid[i] = beta*outputs[i]*(1-outputs[i]); //k*(e**-k*outputs[i])/(((e**-k*outputs[i])+1)**2); //(e**-outputs[i])*(l+(e**-outputs[i]))**2; //outputs[i]*(1-outputs[i]); //outputs[i]*(1-outputs[i]);
           }
-          redeNeural.camada[n].dSigmoid = dSigmoid;
-          //console.log("dSigmoid pesos camada: "+n+" -> "+JSON.stringify(redeNeural.camada[n].neuronios));
+          redeNeural.camada[n].derivadaSigmoid = derivadaSigmoid;
+          //console.log("derivadaSigmoid pesos camada: "+n+" -> "+JSON.stringify(redeNeural.camada[n].neuronios));
      }
      this.calcularGradiente = function(k,n){
           var gradiente = [];
           var sinal = redeNeural.sinalGradiente;
-          var outputsNeuronios = []; // transformado em array
           var camada = redeNeural.camada[n];
-          (n == redeNeural.camada.length-1? outputsNeuronios = redeNeural.amostras[k].output.split("") : outputsNeuronios = camada.outputs);
-          alert(camada.neuronios.length+" - "+n);
+          var lastY = redeNeural.amostras[k].output.split("");
           for(i=0;i<camada.neuronios.length;i++){
-               var dK = outputsNeuronios[i];
-               var output = camada.outputs[i];
                var soma = 0;
-               
-               //
-               // GRADIENTE ESTÁ ZERANDO
-               // ERRO AQUI: (dK-output)
-               //gradiente[i] = sinal*(dK-output)*dSigmoid;//sinal*(output-camada.dSigmoid[i]);]
-               if(n == redeNeural.camada.length-1){ // se for == ultima camada
-                    //var outputY = redeNeural.camada[n-1].outputs;
-                    //gradiente[i] = sinal*(dK-output)*output*(1-output)*outputY[i];
-                    //alert(JSON.stringify(outputY));
-                    var dSigmoid = redeNeural.camada[n-1].dSigmoid[i];
-                    gradiente[i] = sinal*(dK-output)*dSigmoid;
+               if(n == redeNeural.camada.length-1){
+                    var output = camada.outputs[i];
+                    var derivadaSigmoid = redeNeural.camada[n-1].derivadaSigmoid[i];
+                    gradiente[i] = sinal*(lastY[i]-output)*derivadaSigmoid;
+/*                     console.log("Gradiente SAÍDA SE n == ultima camada:"+
+                    "\nlastY["+i+"]: "+lastY[i]+
+                    "\noutput: "+output+
+                    "\nderivadaSigmoide: "+derivadaSigmoid+
+                    "\ngradiente: "+gradiente[i]+
+                    "\ncamada[n]: "+n+
+                    "\nneuronio[i]: "+i); */
                }
                else{
                     var c = redeNeural.camada[n+1];
+                    var d = camada.derivadaSigmoid[i];
                     for(j=0;j<c.neuronios.length;j++){
-                         var d = camada.dSigmoid[j];
                          var g = c.gradiente[j];
                          var w = c.neuronios[j].pesos;
-                         alert(w);
-                         soma += g*w*d;
+                         for(p=0;p<w.length;p++){
+                              soma += g*w[p];
+                         }
+                         // erro aqui, sigmoid undefined n+1 bate key errada
+/*                          console.log("Gradiente SAÍDA SE n < ultima camada:"+
+                         "\nneuronio[j]: "+j+
+                         "\ncamada[n]: "+n+
+                         "\noutput: "+output+
+                         "\npesos: "+w+
+                         "\nderivadaSigmoide: "+d+
+                         "\ngradiente: "+g+
+                         "\nsoma[j]: "+soma); */
                     }
-                    gradiente[i] = soma;
+                    gradiente[i] = soma*d;
                }
-               //
-               // -(y1-go1)*go1(1-go1)
-
-               //console.log("Gradiente["+i+"]: camada ["+n+"]\nvalor: "+gradiente[i]+"\ndK["+i+"]: "+dK+"\noutput["+i+"]"+output+"\ndSigmoid["+i+"]"+dSigmoid);     
           }
           redeNeural.camada[n].gradiente = gradiente;
           //console.log("Gradientes camada["+n+"]: "+JSON.stringify(redeNeural.camada[n].gradiente));
@@ -149,49 +146,40 @@ this.pmc = function(){
           var camada = redeNeural.camada[n];
           var inputs = redeNeural.amostras[k].inputs
           var qtdNeuronios = camada.neuronios.length;
-          //console.log("recalcularPesos inicio laço 1 camada n="+n+"\nqtdNeuronios: "+qtdNeuronios+"\ninputs"+JSON.stringify(inputs));
+          //alert("recalcularPesos inicio laço 1 camada n="+n+"\nqtdNeuronios: "+qtdNeuronios+"\ninputs"+JSON.stringify(inputs));
+          //console.clear();
           for(i=0;i<qtdNeuronios;i++){
                var saida = [];
                var wbefore = camada.wbefore[i].pesos;
                var pesos = camada.neuronios[i].pesos;
-               (n>0? saida = redeNeural.camada[n-1].outputs : saida = inputs);
-               //alert("Saída como entrada para o ngy: "+JSON.stringify(saida));
-               //console.log("recalcularPesos inicio laço 2 camada["+n+"], "+qtdNeuronios+"neuronios. \npesos"+JSON.stringify(pesos));
-               for(j=0;j<pesos.length;j++){
-                    //console.log("recalcularPesos INTERNO laço 2 camada["+n+"], "+qtdNeuronios+"neuronios. \nsaida["+i+"]: "+saida[i]);
+               (n>0? saida = redeNeural.camada[n-1].outputs : saida = inputs); // erro está no numero de saídas CORRIGIR
+               for(j=0;j<saida.length;j++){
                     var alfa = redeNeural.alfa;
-                    var ngy = pesos[j] + redeNeural.txAprendizagem * camada.gradiente[i] * saida[i];
-                    //console.log("recalcularPesos INTERNO laço 2 camada["+n+"], "+qtdNeuronios+"neuronios.\ngradiente["+i+"]: "+camada.gradiente[i]);
-                    
-                    var momentum = alfa*(ngy - wbefore[j]);
-                    
-                    // o termo de momentum leva em conta o w da época
-
-                    //console.log("recalcularPesos INTERNO laço 2 camada["+n+"], "+qtdNeuronios+"neuronios.\nwbefore["+j+"]: "+wbefore[j]);
-                    
-/*                     alert("TESTE DE MESA"+
+                    var ngy = pesos[j] + redeNeural.txAprendizagem * camada.gradiente[i] * saida[j];
+                    var momentum = alfa*(ngy - wbefore[j]);                    
+/*                     console.log("RECÁLCULO DOS PESOS:"+
+                    "\nn (camada): "+n+
+                    "\nneurônio: "+i+
+                    "\nk (amostra): "+k+
                     "\nj (pesos.length): "+j+
                     "\npesos length: "+pesos.length+
-                    "\nk (amostra): "+k+
-                    "\nn (camada): "+n+
-                    "\ngradiente: "+camada.gradiente[i]+
+                    "\ngradiente["+i+"]: "+camada.gradiente[i]+
                     "\naprendizagem: "+redeNeural.txAprendizagem+
+                    "\nerro de k["+k+"]: "+redeNeural.erro[k]+
                     "\nqtdNeuronios: "+qtdNeuronios+
                     "\nInputs: "+inputs.length+
-                    "\npesos: "+JSON.stringify(pesos)+
                     "\nSaida length: "+saida.length+
-                    "\nSaida: "+saida[i]+
+                    "\nSaida["+j+"]: "+saida[j]+
                     "\nngy: "+ngy+
                     "\nwBefore: "+wbefore[j]+
                     "\nmomentum: "+momentum+
-                    "\npesos: "+JSON.stringify(pesos[j])); */
+                    "\npesos: "+JSON.stringify(pesos)+
+                    "\npesos["+j+"]: "+JSON.stringify(pesos[j])); */
 
                     pesos[j] = ngy + momentum;
                }
                camada.neuronios[i].pesos = pesos;
-               //console.log("Pesos gerais\ncamada: "+n+"\nneuronio: "+i+"\n"+JSON.stringify(camada));
           }
-          //console.log("wBefore: "+n+" -> "+JSON.stringify(camada.wbefore));
      }
      this.erroAmostra = function(dK){
           var erroAmostra = 0;
@@ -200,9 +188,11 @@ this.pmc = function(){
           var qtd = dK.length; //redeNeural.camada[n].outputs.length;
           for(i=0;i<qtd;i++){
                soma += dK[i]-redeNeural.camada[n].outputs[i]; // falha aqui, outputs(len=4) superando dK(len=4)
+               //soma = soma**2;
                //alert("erroAmostra camada: "+n+"\nsoma: "+soma+"\nqtdOutputs: "+qtd+"\noutputs: "+redeNeural.camada[n].outputs[i]+"\ndK["+i+"]: "+dK[i]);
           }
           erroAmostra = (soma**2)/2;
+          //erroAmostra = (soma)/2;
           //alert("erroAmostra: "+erroAmostra+"\nsoma: "+soma+"\ndK: "+JSON.stringify(dK));
           return erroAmostra;
      }
@@ -214,7 +204,7 @@ this.pmc = function(){
                soma += redeNeural.erro[i];
           }
           eqm =  soma/p;
-          //console.log("calcularEqm EQM: "+eqm+"\np: "+p+"\nsoma: "+soma);
+          //alert("calcularEqm EQM: "+eqm+"\np: "+p+"\nsoma: "+soma);
           return eqm;
      }
      this.treinamento = function(dados){
@@ -230,13 +220,12 @@ this.pmc = function(){
                for(k=0;k<redeNeural.amostras.length;k++){
                     var input = dados[k].inputs;
                     for(n=0;n<camadas;n++){
-                         //console.log("camada laço treinamento: "+n+"\ninput: "+input);
                          redeNeural.calcularU(input,n);
                          redeNeural.funcaoAtivacao(n);
-                         redeNeural.dSigmoid(n);
+                         //alert("Saída: "+JSON.stringify(redeNeural.camada[camadas-1].outputs)+"\ndados: "+JSON.stringify(dados[k].output));
+                         redeNeural.derivadaSigmoid(n);
                          input = redeNeural.camada[n].outputs;
-                         if(n==0 || n<(camadas-1)){input.unshift(redeNeural.bias);} // acrescenta bias na saída da camada 2 em diante, menos na última camada
-                         //alert("Treinamento \ncamada: "+n+"\nneuronio: "+i+"\n"+JSON.stringify(redeNeural.camada[n].neuronios));
+                         if(n>0 && n<camadas-1){input.unshift(redeNeural.bias);} // acrescenta bias na saída da camada 2 em diante, menos na última camada
                     }
                     for(n=(camadas-1);n>=0;n--){
                          redeNeural.calcularGradiente(k,n);
@@ -245,14 +234,13 @@ this.pmc = function(){
                     redeNeural.erro[k] = redeNeural.erroAmostra(dados[k].output);
                }
                eqmAtual = redeNeural.calcularEqm();
-               //alert(Math.abs(eqmAtual - eqmAnterior));
                for(n=0;n<camadas;n++){
-                    let camada = redeNeural.camada[n];
-                    for(i=0;i<camada.length;i++){
-                         camada.wbefore[i].pesos = redeNeural.camada[n].neuronios[i].pesos;
+                    for(i=0;i<redeNeural.camada[n].length;i++){
+                         redeNeural.camada[n].wbefore[i].pesos = redeNeural.camada[n].neuronios[i].pesos;
                     }
                }
                numEpoca++;
+               //console.log("Treinamento epoca:"+numEpoca+"\nneuronios: "+JSON.stringify(redeNeural.camada));
           }
           redeNeural.numEpocas = numEpoca;
           redeNeural.tempoExecucao[1] = Date.now();
@@ -277,13 +265,13 @@ this.pmc = function(){
                for(n=0;n<numCamadas;n++){
                     redeNeural.calcularU(input,n);
                     redeNeural.funcaoAtivacao(n);
+                    //alert("Input["+n+"]: "+JSON.stringify(input)+"\nSaída de U["+n+"]: "+JSON.stringify(redeNeural.camada[n].outputsU)+"\nSaída de sigmoid["+n+"]: "+JSON.stringify(redeNeural.camada[n].outputs));
                     //console.log("k="+k+"\ncamada["+n+"]\nnum camadas: "+numCamadas+"\ninputs teste: "+JSON.stringify(input)+"\noutputs teste: "+redeNeural.camada[n].outputs+"\ntamanho de dados: "+dados.length);
-                    input = redeNeural.camada[n].outputs;
+                    if(n<numCamadas-1){input = redeNeural.camada[n].outputs;}
                     //if(n>0 || n<(numCamadas-1)){input.unshift(redeNeural.bias);}
                     //console.log(JSON.stringify(redeNeural.camada[numCamadas-1].outputsU));
                }
                resultado[k] = redeNeural.camada[numCamadas-1].outputs;
-               //console.log(JSON.stringify(input));
                console.log(JSON.stringify(resultado[k]));
           }
      }
