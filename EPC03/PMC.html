@@ -21,6 +21,7 @@
                 border: 0;
                 overflow: hidden;
                 text-align: center;
+                vertical-align: middle;
             }
 
             #pausaDeTelaDivCentroIndex{
@@ -29,6 +30,7 @@
                 width: 200px;
                 height: 100px;       
                 z-index:99;
+                margin: auto;
                 margin-left: -100px;
                 margin-top: -50px;
                 left: 50%;
@@ -37,8 +39,13 @@
                 background-color: rgba(0, 0, 0, 0.5); 
                 border: 0;
                 overflow: hidden;
-                text-align: center;
                 border-radius: 7px;
+                color: rgba(255,255,255,1);
+                font-weight: bold;
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+                vertical-align: middle;
             }
             .progressbar {
                 position: absolute;
@@ -51,10 +58,12 @@
                 color: rgba(255,255,255,1);
                 font-weight: bold;
                 border: 0;
+                vertical-align: middle;
             }
         </style>
         <title>Perceptron Multicamadas - EPC03 - PGCC 2020.1</title>
         <script src="PMC.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
         function filtrarArray(array){
             var retorno = array.filter(function (el) {
@@ -150,17 +159,111 @@
                                 var txAprendizagem = 0.1;
                                 relation = relation.split(" "); // marcador da relação do arquivo
                                 neuronio.iniciar(txAprendizagem,topologia,classes,momentum);
+                                function calcularMedia(array){
+                                    var media = 0;
+                                    for(x=0;x<array.length;x++){
+                                        media += (array[x]);
+                                    }
+                                    return media;
+                                }
+                                function desvioPadrao(array,media){
+                                    var desvio = 0;
+                                    for(x=0;x<array.length;x++){
+                                        desvio += (array[x]-media);
+                                    }
+                                    var r = desvio/array.length;
+                                    desvio = Math.sqrt(r**2);
+                                    return desvio;
+                                }
                                 var i = 0;
-                                //executa o k-fold
+                                var t = (amostras.length)/10;
                                 for(x=0;x<3;x++){
-                                    for(k=0;k<(amostras.length/10);k++){
+                                    for(z=0;z<t;z++){
                                         let treinamento = amostras;
                                         treinamento.splice(i,15);
-                                        neuronio.treinamento(treinamento,k);
-                                        neuronio.teste(amostras.slice(i,i+14),k);
+                                        neuronio.treinamento(treinamento,z);
+                                        neuronio.teste(amostras.slice(i,i+14),z);
                                         i = i+15;
                                     }
                                 }
+
+                                var qtdTestes = neuronio.testes.length;
+                                var eqmArrayTeste = [];
+                                var tempoArrayTeste = []
+                                for(x=0;x<qtdTestes;x++){
+                                    eqmArrayTeste[x] = neuronio.testes[x].eqm;
+                                    tempoArrayTeste[x] = neuronio.testes[x].tempoexecucao
+                                }
+                                var mediaEqmTeste = calcularMedia(eqmArrayTeste);
+                                var desvioEqmTeste = desvioPadrao(eqmArrayTeste,mediaEqmTeste);
+                                var mediaTempoTeste = calcularMedia(tempoArrayTeste);
+                                var desvioTempoTeste = desvioPadrao(tempoArrayTeste,mediaTempoTeste);
+
+
+                                var qtdTreinamento = neuronio.treinamentos.length;
+                                var eqmArrayTreinamento = [];
+                                var tempoArrayTreinamento = [];
+                                var epocasArrayTreinamento = [];
+                                for(x=0;x<qtdTreinamento;x++){
+                                    eqmArrayTreinamento[x] = neuronio.treinamentos[x].eqm;
+                                    tempoArrayTreinamento[x] = neuronio.treinamentos[x].tempoexecucao
+                                    epocasArrayTreinamento[x] = neuronio.treinamentos[x].epocas
+                                }
+                                var mediaEqmTreinamento = calcularMedia(eqmArrayTreinamento);
+                                var desvioEqmTreinamento = desvioPadrao(eqmArrayTreinamento,mediaEqmTreinamento);
+                                var mediaTempoTreinamento = calcularMedia(tempoArrayTreinamento);
+                                var desvioTempoTreinamento = desvioPadrao(tempoArrayTreinamento,mediaTempoTreinamento);
+                                var mediaEpocasTreinamento = calcularMedia(epocasArrayTreinamento);
+                                var desvioEpocasTreinamento = desvioPadrao(epocasArrayTreinamento,mediaEpocasTreinamento);
+                                var folds = "";
+                                for(x=1;x<16;x++){
+                                    folds += "<td>"+x+"</td>";
+                                }
+                                var eqms = "";
+                                for(x=0;x<eqmArrayTreinamento.length;x++){
+                                    eqms += "<td>"+eqmArrayTreinamento[x]+"</td>";
+                                }
+                                var tempoTreina = "";
+                                for(x=0;x<eqmArrayTreinamento.length;x++){
+                                    tempoTreina += "<td>"+(tempoArrayTreinamento[x]/1000)+" seg</td>";
+                                }                                
+                                var epocas = "";
+                                for(x=0;x<epocasArrayTreinamento.length;x++){
+                                    epocas += "<td>"+epocasArrayTreinamento[x]+"</td>";
+                                }
+                                var tempoTeste = "";
+                                for(x=0;x<tempoArrayTeste.length;x++){
+                                    tempoTeste += "<td>"+(tempoArrayTeste[x]/1000)+" seg</td>";
+                                }
+                                var eqmTeste = "";
+                                for(x=0;x<eqmArrayTeste.length;x++){
+                                    eqmTeste += "<td>"+eqmArrayTeste[x]+"</td>";
+                                }
+$("#tabela").html("<table style='border: 1px solid black;'><tr><td colspan=15>TABELA 01</td></tr><tr><td colspan=15>amostras: "+(amostras.length*2)+"</td></tr><tr><td colspan=15>10 folds cross-validation:</td></tr>"+
+    "<tr><td colspan=15>Treinamento:</td></tr>"+
+    "<tr><td colspan=4>Topologia: </td><td colspan=11>"+JSON.stringify(neuronio.topologia)+"</td></tr>"+
+    "<tr>"+folds+"</tr>"+
+    "<tr>"+epocas+"</tr>"+
+    "<tr>"+eqms+"</tr>"+
+    "<tr>"+tempoTreina+"</tr>"+
+    "<tr><td colspan=4>EQM Médio: </td><td colspan=11>"+mediaEqmTreinamento+"</td></tr>"+
+    "<tr><td colspan=4>Desvio do EQM: </td><td colspan=11>"+desvioEqmTreinamento+"</td></tr>"+
+    "<tr><td colspan=4>Tempo Médio: </td><td colspan=11>"+mediaTempoTreinamento+"</td></tr>"+
+    "<tr><td colspan=4>Desvio do tempo: </td><td colspan=11>"+desvioTempoTreinamento+"</td></tr>"+
+    "<tr><td colspan=4>Média de épocas: </td><td colspan=11>"+mediaEpocasTreinamento+"</td></tr>"+
+    "<tr><td colspan=4>Desvio de épocas: </td><td colspan=11>"+desvioEpocasTreinamento+"</td></tr>"+
+    "<tr><td colspan=15><hr></td></tr>"+
+    "<tr><td colspan=15>Teste:</td></tr>"+
+    "<tr>"+folds+"</tr>"+
+    "<tr>"+eqmTeste+"</tr>"+
+    "<tr>"+tempoTeste+"</tr>"+
+    "<tr><td colspan=4>EQM Médio: </td><td colspan=11>"+mediaEqmTeste+"</td></tr>"+
+    "<tr><td colspan=4>Desvio do EQM: </td><td colspan=11>"+desvioEqmTeste+"</td></tr>"+
+    "<tr><td colspan=4>Tempo Médio: </td><td colspan=11>"+mediaTempoTeste+"</td></tr>"+
+    "<tr><td colspan=4>Desvio do tempo: </td><td colspan=11>"+desvioTempoTeste+"</td></tr>"+
+    "</table>");
+
+                                                    //////  datasets obsoletos /////
                                                     var datasets = [{
                                                         iris: [ 
                                                         {inputs: [5.0, 3.6, 1.4, 0.2]},
@@ -264,7 +367,10 @@
             </div>
         </div>
         <div id="dadosSaida">
-        <img src="pgcc.png" width=116px height=65px>
+        <img src="pgcc.png" width=116px height=65px><br>
+        PGCC0015 Inteligência Computacional - EPC03<br>
+        Professor: Matheus Giovanni Pires<br>
+        Aluno: Noberto Pires Maciel
         <hr>
         <table>
             <tr>
@@ -294,6 +400,7 @@
         </table>
         <button onclick="bloquear();rodar();" id="btn">Iniciar</button><br>
             <p>
+        <hr>
             Topologia: <span id="topologia"></span><br>
             Saída treinamento: <span id="saida"></span><br>
             Termo de momentum (valor de α): <span id="termomomentum"></span><br>
@@ -303,6 +410,9 @@
             Tempo Execução treinamento: <span id="tempo"></span>ms<br>
             <font size="2pt">**A normalização é feita automaticamente para amostras com valores máximos acima de 1.</font>
             </p>
+        </div>
+        <hr>
+        <div id="tabela">          
         </div>
         <hr>
         <p id="classes"></p>
