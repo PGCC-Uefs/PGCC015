@@ -1,0 +1,4 @@
+question 1: maximo global de f(x): [2.85027349]  x: [1.85056502]
+question 2: maximo global de f(x): [2.85027349]  x: [1.85056502]
+question 3: maximo global de f(x): [2.85027349]  x: [1.85056502]
+question 4: maximo global de f(x): [2.85027349]  x: [1.85056502]
