@@ -1,0 +1,47 @@
+[System]
+Name='epc05'
+Type='mamdani'
+Version=2.0
+NumInputs=2
+NumOutputs=1
+NumRules=9
+AndMethod='min'
+OrMethod='max'
+ImpMethod='min'
+AggMethod='max'
+DefuzzMethod='centroid'
+
+[Input1]
+Name='temperature'
+Range=[800 1200]
+NumMFs=3
+MF1='baixa':'trimf',[633.3 800 966.7]
+MF2='media':'trimf',[833.3 1000 1167]
+MF3='alta':'trimf',[1033 1200 1367]
+
+[Input2]
+Name='volume'
+Range=[4 12]
+NumMFs=3
+MF1='pequeno':'trimf',[0.6663 4 7.334]
+MF2='medio':'trimf',[4.666 8 11.34]
+MF3='grande':'trimf',[8.666 12 15.34]
+
+[Output1]
+Name='pression'
+Range=[2 12]
+NumMFs=3
+MF1='baixa':'trimf',[-2.167 2 6.167]
+MF2='media':'trimf',[2.833 7 11.18]
+MF3='alta':'trimf',[7.833 12 16.18]
+
+[Rules]
+1 1, 1 (1) : 1
+2 1, 1 (1) : 1
+3 1, 2 (1) : 1
+1 2, 1 (1) : 1
+2 2, 2 (1) : 1
+3 2, 3 (1) : 1
+1 3, 2 (1) : 1
+2 3, 3 (1) : 1
+3 3, 3 (1) : 1
