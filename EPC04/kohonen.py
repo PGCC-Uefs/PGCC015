@@ -1,4 +1,4 @@
-# som_iris.py
+# kohonen.py
 # SOM for Iris dataset
 # Anaconda3 5.2.0 (Python 3.6.5)
 
@@ -6,11 +6,12 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-# note: if this fails, try >pip uninstall matplotlib
-# and then >pip install matplotlib
+import time
+
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.cluster import KMeans
 
 def closest_node(data, t, map, m_rows, m_cols):
-  # (row,col) of map node closest to data[t]
   result = (0,0)
   small_dist = 1.0e20
   for i in range(m_rows):
@@ -41,18 +42,16 @@ def main():
   # 0. get started
   np.random.seed(1)
   Dim = 4
-  Rows = 30; Cols = 30
+  Rows = 60; Cols = 60
   RangeMax = Rows + Cols
   LearnMax = 0.5
   StepsMax = 5000
 
   # 1. load data
   print("\nLoading Iris data into memory \n")
-  data_file = ".\\Data\\iris_data_012.txt"
-  data_x = np.loadtxt(data_file, delimiter=",", usecols=range(0,4),
-    dtype=np.float64)
-  data_y = np.loadtxt(data_file, delimiter=",", usecols=[4],
-    dtype=np.int)
+  data_file = "https://raw.githubusercontent.com/PGCC-Uefs/PGCC015/master/EPC04/datasets/iris.txt"
+  data_x = np.loadtxt(data_file, delimiter=",", usecols=range(0,4), dtype=np.float64)
+  data_y = np.loadtxt(data_file, delimiter=",", usecols=[4], dtype=np.int)
   # option: normalize data  
 
   # 2. construct the SOM
@@ -70,7 +69,7 @@ def main():
       for j in range(Cols):
         if manhattan_dist(bmu_row, bmu_col, i, j) < curr_range:
           map[i][j] = map[i][j] + curr_rate * \
-(data_x[t] - map[i][j])
+  (data_x[t] - map[i][j])
   print("SOM construction complete \n")
 
   # 3. construct U-Matrix
@@ -119,6 +118,5 @@ def main():
   plt.show()
 
 # ==================================================================
-
 if __name__=="__main__":
   main()
